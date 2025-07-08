@@ -16,6 +16,10 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["development"]
+    "customConditions": ["development"],
+    "baseUrl": ".",                       // <-- Add this line
+    "paths": {                            // <-- And this block
+      "@packages/*": ["packages/*"]
+    }
   }
 }
