@@ -7,8 +7,14 @@ import {
   verifyOtp,
 } from '../utils/auth.helper';
 import { prisma } from '@packages/libs/prisma';
-import { ValidationError } from '@packages/error-handler';
+import {
+  AuthError,
+  PasswordError,
+  ValidationError,
+} from '@packages/error-handler';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { setCookie } from '../utils/cookies/etCookie';
 
 // Register a new user
 export const userRegistration = async (
@@ -59,13 +65,75 @@ export const verifyUser = async (
     await verifyOtp(email, otp, next);
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    prisma.users.create({
+    await prisma.users.create({
       data: { name, email, password: hashedPassword },
     });
+ 
 
     res
       .status(201)
       .json({ success: true, message: 'User registered successfully!' });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+// login user
+export const loginUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return next(new ValidationError(`Email and password are required!`));
+    }
+
+    const user = await prisma.users.findFirst({ where: { email } });
+
+    if (!user) {
+      return next(new AuthError('Account not found'));
+    }
+
+    // verify password
+    if (!user.password) {
+      return next(new PasswordError('Password is required'));
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return next(new AuthError('Invalid email or password'));
+    }
+
+    // Generate access and refresh token
+    const accessToken = jwt.sign(
+      { id: user.id, role: 'user' },
+      process.env.ACCESS_TOKEN_SECRET as string,
+      {
+        expiresIn: '15m',
+      }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: user.id, role: 'user' },
+      process.env.REFRESH_TOKEN_SECRET as string,
+      {
+        expiresIn: '7d',
+      }
+    );
+
+    // store the refresh and access token in an httpOnly secure cookie
+    setCookie(res, 'accessToken', accessToken);
+    setCookie(res, 'refreshToken', refreshToken);
+
+    res
+      .status(200)
+      .json({
+        message: 'User logged in successfully',
+        user: { id: user.id, email: user.email, name: user.name },
+      });
   } catch (error) {
     return next(error);
   }
