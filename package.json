@@ -3,17 +3,33 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "npx nx run-many --target=serve --all"
+    "dev": "npm run dev:all",
+    "dev:auth": "ts-node -r tsconfig-paths/register apps/auth-service/src/main.ts",
+    "dev:gateway": "ts-node -r tsconfig-paths/register apps/api-gateway/src/main.ts",
+    "dev:all": "concurrently \"npm run dev:auth\" \"npm run dev:gateway\"",
+    "build:packages": "tsc -p packages/tsconfig.json",
+    "watch:packages": "tsc -p packages/tsconfig.json --watch",
+    "dev:local": "ts-node -r tsconfig-paths/register apps/auth-service/src/main.ts",
+    "build": "npm run build:packages && npx nx run-many --target=build --all"
   },
   "private": true,
   "dependencies": {
+    "@prisma/client": "^6.11.1",
+    "@upstash/redis": "^1.35.1",
     "axios": "^1.6.0",
+    "concurrently": "^9.2.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "dotenv": "^17.1.0",
+    "ejs": "^3.1.10",
     "express": "^4.21.2",
     "express-http-proxy": "^2.1.1",
     "express-rate-limit": "^7.5.1",
+    "ioredis": "^5.6.1",
     "morgan": "^1.10.0",
+    "nodemailer": "^7.0.5",
+    "prisma": "^6.11.1",
+    "swagger-autogen": "^2.23.7",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
@@ -36,13 +52,16 @@
     "@swc/jest": "~0.2.36",
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
+    "@types/ejs": "^3.1.5",
     "@types/express": "^4.17.21",
     "@types/express-http-proxy": "^1.6.6",
     "@types/jest": "^29.5.12",
     "@types/morgan": "^1.9.10",
     "@types/node": "~18.16.9",
+    "@types/nodemailer": "^6.4.17",
     "@types/swagger-ui-express": "^4.1.8",
     "ajv": "^8.17.1",
+    "cross-env": "^7.0.3",
     "esbuild": "^0.19.2",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
@@ -52,11 +71,13 @@
     "prettier": "2.8.8",
     "react-refresh": "^0.10.0",
     "ts-jest": "^29.1.0",
-    "ts-node": "10.9.1",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
     "tslib": "^2.3.0",
     "typescript": "~5.8.2",
     "typescript-eslint": "^8.29.0",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^5.1.4",
+    "webpack-node-externals": "^3.0.0"
   },
   "workspaces": [
     "apps/*"

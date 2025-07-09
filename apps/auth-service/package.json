@@ -43,23 +43,13 @@
         }
       },
       "serve": {
-        "continuous": true,
         "executor": "@nx/js:node",
-        "defaultConfiguration": "development",
-        "dependsOn": [
-          "build"
-        ],
         "options": {
-          "buildTarget": "@e-shopv2/auth-service:build",
-          "runBuildTargetDependencies": false
-        },
-        "configurations": {
-          "development": {
-            "buildTarget": "@e-shopv2/auth-service:build:development"
-          },
-          "production": {
-            "buildTarget": "@e-shopv2/auth-service:build:production"
-          }
+          "main": "apps/auth-service/src/main.ts",
+          "runtimeArgs": [
+            "-r",
+            "tsconfig-paths/register"
+          ]
         }
       },
       "test": {
