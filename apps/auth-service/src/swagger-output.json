@@ -6,10 +6,10 @@
     "version": "1.0.0"
   },
   "host": "localhost:6001",
-  "basePath": "/",
+  "basePath": "/api",
   "schemes": ["http"],
   "paths": {
-    "/api/user-registration": {
+    "/user-registration": {
       "post": {
         "description": "",
         "parameters": [
@@ -23,10 +23,10 @@
                   "example": "Jane Doe"
                 },
                 "email": {
-                  "example": "jdoe@example.com"
+                  "example": "jd@example"
                 },
                 "password": {
-                  "example": "password"
+                  "example": "somepassword"
                 }
               }
             }
@@ -35,6 +35,39 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/verify-user": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "janedoe@example"
+                },
+                "otp": {
+                  "example": "1234"
+                },
+                "password": {
+                  "example": "12345678"
+                },
+                "name": {
+                  "example": "Jane Doe"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
           }
         }
       }
