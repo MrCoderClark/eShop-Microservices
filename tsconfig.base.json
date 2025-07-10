@@ -19,10 +19,7 @@
     "customConditions": ["development"],
     "baseUrl": ".",
     "paths": {
-      "@packages/*": [
-        "packages/*",
-        "dist/packages/*"
-      ]
+      "@packages/*": ["packages/*", "dist/packages/*"]
     }
   }
 }
