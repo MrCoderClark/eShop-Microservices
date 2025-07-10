@@ -7,6 +7,8 @@ import Link from 'next/link';
 import GoogleButton from '../../../shared/components/google-button';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
+import axios, { Axios, AxiosError } from 'axios';
 
 type FormData = {
   email: string;
@@ -15,7 +17,7 @@ type FormData = {
 
 const Page = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [serverError, setserverError] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
 
   const router = useRouter();
@@ -25,8 +27,32 @@ const Page = () => {
     formState: { errors },
   } = useForm<FormData>();
 
+  const loginMutation = useMutation({
+    mutationFn: async (data: FormData) => {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/login-user`,
+        data,
+        {
+          withCredentials: true,
+        }
+      );
+
+      return response.data;
+    },
+    onSuccess: () => {
+      setServerError(null);
+      router.push('/');
+    },
+    onError: (error: AxiosError) => {
+      const errorMessage =
+        (error.response?.data as { message: string })?.message ||
+        'Invalid credentials!';
+      setServerError(errorMessage);
+    },
+  });
+
   const onSubmit = (data: FormData) => {
-    console.log(data);
+    loginMutation.mutate(data);
   };
 
   return (
@@ -122,10 +148,11 @@ const Page = () => {
               </Link>
             </div>
             <button
+              disabled={loginMutation.isPending}
               type="submit"
               className="w-full text-lh cursor-pointer bg-black text-white py-2 rounded-lg"
             >
-              Login
+              {loginMutation.isPending ? 'Logging in...' : 'Login'}
             </button>
 
             {serverError && <p className="text-red-500">{serverError}</p>}
