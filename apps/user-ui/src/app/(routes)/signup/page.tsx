@@ -110,7 +110,9 @@ const Signup = () => {
   };
 
   const resendOtp = () => {
-    console.log('Resend OTP');
+    if (userData) {
+      signUpMutation.mutate(userData);
+    }
   };
 
   return (
