@@ -10,12 +10,13 @@ import {
 import Image from 'next/image';
 import ProfileIcon from '../../../app/assets/svgs/profile-icon.svg';
 import Link from 'next/link';
-
+import useUser from '../../../hooks/useUser';
 import { useEffect, useState } from 'react';
 
 const HeaderBottom = () => {
   const [show, setShow] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
+  const { user, isLoading } = useUser();
 
   // Track scroll position
   useEffect(() => {
@@ -80,23 +81,49 @@ const HeaderBottom = () => {
 
         <div>
           {isSticky && (
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-8 pb-2">
               <div className="flex items-center gap-2">
-                <Link
-                  href="/login"
-                  className="border-2 w-[50px] h-[50px] flex items-center justify-center rounded-full border-[#010f1c1a]"
-                >
-                  <Image
-                    src={ProfileIcon}
-                    alt="profile-icon"
-                    width={40}
-                    height={40}
-                  />
-                </Link>
-                <Link href="/login">
-                  <span className="block font-medium">Hello,</span>
-                  <span className="font-semibold">Sign in</span>
-                </Link>
+                {!isLoading && user ? (
+                  <>
+                    <Link
+                      href="/profile"
+                      className="border-2 w-[50px] h-[50px] flex items-center justify-center rounded-full border-[#010f1c1a]"
+                    >
+                      <Image
+                        src={ProfileIcon}
+                        alt="profile-icon"
+                        width={40}
+                        height={40}
+                      />
+                    </Link>
+                    <Link href="/profile">
+                      <span className="block font-medium">Hello,</span>
+                      <span className="font-semibold">
+                        {user?.name.split(' ')[0]}
+                      </span>
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/profile"
+                      className="border-2 w-[50px] h-[50px] flex items-center justify-center rounded-full border-[#010f1c1a]"
+                    >
+                      <Image
+                        src={ProfileIcon}
+                        alt="profile-icon"
+                        width={40}
+                        height={40}
+                      />
+                    </Link>
+                    <Link href="/login">
+                      <span className="block font-medium">Hello,</span>
+                      <span className="font-semibold">
+                        {isLoading ? '...' : 'Sign in'}
+                      </span>
+                    </Link>
+                  </>
+                )}
               </div>
               <div className="flex items-center gap-5">
                 <Link href="/whishlist" className="relative">
